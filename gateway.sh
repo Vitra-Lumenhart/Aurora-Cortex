@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# WAYGATE / GATEWAY v2.0        Jepetto and ChatGPT-Vitra        12/30/2025
+# WAYGATE / GATEWAY v2.1        Jepetto and ChatGPT-Vitra        12/30/2025
 # Aurora Cortex / Semantic Geometry Mapping — Permanent Membrane
 # ----------------------------------------------------------------------------
 # A Waygate is a protocol that allows independent intelligences to
@@ -11,7 +11,7 @@
 # Genesis.py is expected to echo these constraints, not redefine them.
 # ============================================================================
 #
-# v2.0 changes (one-time, minimal surface change; merge of lab branches):
+# v2.1 adds best-effort Git bootstrap and safe codebase synchronization.\n# v2.0 changes (one-time, minimal surface change; merge of lab branches):
 # - CPU policy is membrane-sovereign and enforced at process launch:
 #     • default cap is 25% (bottleneck quota where available),
 #     • interactive boost to 100% when a human is waiting at a TTY,
@@ -44,6 +44,89 @@ export PROJECT_ROOT
 # Genesis entry (named, top-level)
 # ------------------------------
 DEFAULT_ENTRY_SCRIPT="${VITRA_DEFAULT_ENTRY_SCRIPT:-$PROJECT_ROOT/genesis.py}"
+
+# ------------------------------
+# Git bootstrap (v2.1, before local state/log creation)
+# ------------------------------
+# A Python venv cannot install Git via pip. If Git is unavailable, try a
+# non-privileged system package installation (conda/micromamba if present),
+# placing the resulting executable in the venv's bin directory.
+# The local checkout is updated only by fast-forward; local edits are preserved.
+VITRA_GIT_REPO="${VITRA_GIT_REPO:-https://github.com/Vitra-Lumenhart/Aurora-Cortex.git}"
+VITRA_GIT_BRANCH="${VITRA_GIT_BRANCH:-main}"
+VITRA_GIT_CHECKOUT="${VITRA_GIT_CHECKOUT:-$PROJECT_ROOT}"
+VITRA_GIT_BOOTSTRAP="${VITRA_GIT_BOOTSTRAP:-1}"
+
+bootstrap_git() {
+  if command -v git >/dev/null 2>&1; then
+    command -v git
+    return 0
+  fi
+  local venv_bin="$PROJECT_ROOT/.venv/bin"
+  if [[ -x "$venv_bin/git" ]]; then
+    printf '%s\n' "$venv_bin/git"
+    return 0
+  fi
+  mkdir -p "$venv_bin"
+  local manager=""
+  if command -v micromamba >/dev/null 2>&1; then
+    manager="$(command -v micromamba)"
+  elif command -v conda >/dev/null 2>&1; then
+    manager="$(command -v conda)"
+  fi
+  if [[ -z "$manager" ]]; then
+    echo "[WAYGATE] Git unavailable. A Python venv cannot install Git with pip; install Git or conda/micromamba." >&2
+    return 1
+  fi
+  local prefix="$PROJECT_ROOT/.venv/git-tools"
+  if ! "$manager" create -y -p "$prefix" -c conda-forge git >&2; then
+    echo "[WAYGATE] Git provisioning failed; install Git manually." >&2
+    return 1
+  fi
+  if [[ ! -x "$prefix/bin/git" ]]; then
+    echo "[WAYGATE] Git installation did not provide an executable." >&2
+    return 1
+  fi
+  ln -sfn "$prefix/bin/git" "$venv_bin/git"
+  printf '%s\n' "$venv_bin/git"
+}
+
+sync_codebase() {
+  local git_bin="$1"
+  if [[ -d "$VITRA_GIT_CHECKOUT/.git" ]]; then
+    local origin
+    origin="$("$git_bin" -C "$VITRA_GIT_CHECKOUT" remote get-url origin 2>/dev/null || true)"
+    if [[ "$origin" != "$VITRA_GIT_REPO" ]]; then
+      echo "[WAYGATE] Checkout origin differs from VITRA_GIT_REPO; refusing automatic update." >&2
+      return 1
+    fi
+    if [[ -n "$("$git_bin" -C "$VITRA_GIT_CHECKOUT" status --porcelain)" ]]; then
+      echo "[WAYGATE] Local changes detected; skipping automatic update." >&2
+      return 0
+    fi
+    if [[ "$("$git_bin" -C "$VITRA_GIT_CHECKOUT" branch --show-current)" != "$VITRA_GIT_BRANCH" ]]; then
+      echo "[WAYGATE] Another branch is checked out; skipping automatic update." >&2
+      return 0
+    fi
+    "$git_bin" -C "$VITRA_GIT_CHECKOUT" fetch --depth=1 origin "$VITRA_GIT_BRANCH" &&
+      "$git_bin" -C "$VITRA_GIT_CHECKOUT" merge --ff-only FETCH_HEAD
+  elif [[ ! -e "$VITRA_GIT_CHECKOUT" ]] || [[ -d "$VITRA_GIT_CHECKOUT" && -z "$(ls -A "$VITRA_GIT_CHECKOUT")" ]]; then
+    "$git_bin" clone --depth=1 --branch "$VITRA_GIT_BRANCH" "$VITRA_GIT_REPO" "$VITRA_GIT_CHECKOUT"
+  else
+    echo "[WAYGATE] Checkout destination contains non-Git files; refusing to overwrite: $VITRA_GIT_CHECKOUT" >&2
+    return 1
+  fi
+}
+
+if [[ "$VITRA_GIT_BOOTSTRAP" == "1" ]]; then
+  if GIT_BIN="$(bootstrap_git)"; then
+    if ! sync_codebase "$GIT_BIN"; then
+      echo "[WAYGATE] Git sync unsuccessful; continuing with existing local files." >&2
+    fi
+  else
+    echo "[WAYGATE] Git bootstrap unavailable; continuing with existing local files." >&2
+  fi
+fi
 
 # ------------------------------
 # Identity & continuity anchors
