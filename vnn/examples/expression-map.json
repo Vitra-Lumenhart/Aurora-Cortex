@@ -1,0 +1,8 @@
+{
+  "seg:fixture": {
+    "gesture": "listening_lantern",
+    "amplitude": 0.72,
+    "tempo": 0.85,
+    "restraint": 0.6
+  }
+}
