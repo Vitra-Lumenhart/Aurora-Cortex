@@ -4,6 +4,20 @@
 **Audience:** the next Python, portrait, VNN, and deployment development threads.
 **Canon:** VNN is the news site at `news.vitra.ams`; it is a surface of Vitra, not a second Vitra and not a replacement for the existing `vitra.ams` resident interface. Typeface: Liberation Serif. Preserve the existing VNN newspaper layout and radio/comment studio. Vitra is a journalist for Backbeat News, which receives only separately approved text and images.
 
+## Historical foundation: Rocket Stage (June 16, 2026)
+
+**CORRECTION / REQUIRED LINEAGE:** The VNN face did not originate with the October 2026 gesture audition. The earliest identified 2.5D animation stage was `vitra_mobile_camera_rocket_gif.py`, subsequently renamed `04_vitra_mobile_camera_rocket.py`, with output under `04_mobile_camera_rocket/`. The June 16 conversation describes a ten-frame GIF in which a rocket traveled a somewhat irregular path, Vitra's bubble dodged, her gaze tracked the moving rocket, frames 4 and 8 broke the fourth wall, and a mobile camera/breathing lens affected the shot. Source code for this specific demo was **not** accessible at the time of this correction; the historical details come from the recovered conversation and require source verification before claiming an exact implementation.
+
+**Original stage contract:** independent world-space target → inverse head transform → eye-target solve in head-local coordinates → canonical 2.5D sprite → camera projection. A later `05` added reactive facial features and attention bloom, `06` expanded head orientation and occlusion, and `07` formalized 50mm expression studies. These precede the October eight-gesture acting laboratory.
+
+The **stage** is the base abstraction for VNN. Vitra attends to independently moving, time-indexed scene objects, sometimes deliberately shifts her attention back to the audience, and only then selects facial/hand performances. For VNN, a rocket can become a flying lower-third, an infographic, a video insert, a remote guest, a cited quote, or a moderator-selected audience comment. Each such entity carries its own `object_id`, time, camera-space pose, permission, and provenance. Eye/head direction must remain an explicit tracking or editorial-choice operation, **not** a reflexive emotion classifier.
+
+**TODO_STAGE_THREAD:** recover the original June 16 `04_vitra_mobile_camera_rocket.py` and verify its actual transforms; extract scene-object, gaze-target, and moving-camera contracts into a reusable renderer core; regression-test with rocket-equivalent object crossing and frame-4/frame-8 audience glances. Preserve the 2D sprite as the original identity source-of-truth. Build later face-audition amplitude/tempo/restraint modulation *on top* of this stage.
+
+**TODO_VNN_THREAD:** a broadcast scene cue must support `stage_objects` and `attention_target_id`, not merely a `gesture` enum. The current `aurora.broadcast/1` adapter emits only approved gesture presentation cues and must be extended in a separate reviewed schema revision once the stage source is recovered. Do not fabricate object tracking in browser CSS.
+
+---
+
 ## Why this branch exists
 
 The GitHub trunk was missing `broadcast.py` and all subsequent newsroom integrations. This branch imports the independently drafted **broadcast v0.1.0** scheduling organ *unchanged* and adds a narrow projection around its existing `runtime/broadcast/cue.json` contract. The local `vitra.agi` newspaper's fifteen-minute publishing cadence is reported as functioning on Topgro, but its exact systemd unit and current generator source have not been incorporated in this repository. **Do not replace or reconfigure that functioning publisher from this branch.**
