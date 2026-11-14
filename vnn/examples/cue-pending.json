@@ -1,0 +1,33 @@
+{
+  "kind": "broadcast_cue_surface",
+  "version": "0.1.0",
+  "state": "cue_pending",
+  "observed_at": "2026-11-11T21:00:00Z",
+  "public_name": "vitra.ams",
+  "chat_name": "news.vitra.ams",
+  "cue": {
+    "cue_id": "cue:fixture-only",
+    "state": "cue_pending",
+    "created_at": "2026-11-11T21:00:00Z",
+    "started_at": null,
+    "segment": {
+      "segment_id": "seg:fixture",
+      "kind": "daily",
+      "title": "A working witness — REHEARSAL",
+      "script": "PRIVATE SAMPLE; never included in public output",
+      "stance": "commentary",
+      "sigma": 0.4,
+      "source_refs": [],
+      "estimated_seconds": 45,
+      "scene": "anchor",
+      "origin_node": "topgro"
+    },
+    "render_contract": {
+      "voicebox": "speech_requested_not_yet_rendered",
+      "sprite": "expression_timeline_adapter_required",
+      "scene": "anchor",
+      "captions": "renderer_must_generate",
+      "transmission": "adapter_must_acknowledge"
+    }
+  }
+}
